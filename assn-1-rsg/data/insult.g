@@ -22,8 +22,10 @@ the Macintosh hypercard stack "Random Insults."  The curses are all
 
 {
 <start>
+You are a <adj> <name> . ;
 You <adj> <name> . ;
 May <curse> . ;
+I hope <curse> . ;
 }
 
 Some others you may want to include, but I like the other two better:
@@ -50,6 +52,7 @@ adj2 more about appearance (used when refering to the mutant beasties)
 {
 <adj1>
 lame ;
+fucking ;
 dried up ;
 par-broiled ;
 bloated ;
@@ -244,6 +247,8 @@ ass ;
 neanderthal ;
 nincompoop ;
 simpleton ;
+cunt ;
+shit-head ;
 <animal> ;
 }
 

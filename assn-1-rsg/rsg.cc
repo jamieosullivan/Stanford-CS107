@@ -11,6 +11,7 @@
 #include <fstream>
 #include "definition.h"
 #include "production.h"
+#include <vector>
 using namespace std;
 
 /**
@@ -38,6 +39,25 @@ static void readGrammar(ifstream& infile, map<string, Definition>& grammar)
     grammar[def.getNonterminal()] = def;
   }
 }
+
+
+/**
+ */
+
+void expandNonterminal(vector<string> &expandedstring, string nonterminalvar, const map<string, Definition> & grammar) {
+
+  const Production & randproduction = grammar.at(nonterminalvar).getRandomProduction();
+  Production::const_iterator curr;
+  for(Production::const_iterator curr = randproduction.begin(); curr != randproduction.end(); curr++) {
+      
+      if (curr[0][0] == '<'){ 
+	  expandNonterminal(expandedstring, *curr, grammar);
+      } else {
+	  expandedstring.push_back(*curr);
+      }
+  }
+}
+
 
 /**
  * Performs the rudimentary error checking needed to confirm that
@@ -72,8 +92,22 @@ int main(int argc, char *argv[])
   // things are looking good...
   map<string, Definition> grammar;
   readGrammar(grammarFile, grammar);
-  cout << "The grammar file called \"" << argv[1] << "\" contains "
-       << grammar.size() << " definitions." << endl;
-  
+
+  // Seed the nonterminal with the starting value
+  string mynonterminal = "<start>";
+
+  // Define a string vector to store the returned data
+  vector<string> expanded;
+
+  // Begins at <start> and selects a random production, expanding
+  // each nonterminal recursively. 
+  // Note, 'expanded' and 'grammar' are references
+  expandNonterminal(expanded, mynonterminal, grammar);
+
+  for(vector<string>::iterator striter = expanded.begin(); striter != expanded.end(); striter++) {
+      cout << *striter << " " ;
+  }
+  cout << endl;
+
   return 0;
 }

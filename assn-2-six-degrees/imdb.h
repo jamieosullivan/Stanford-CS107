@@ -4,6 +4,7 @@
 #include "imdb-utils.h"
 #include <string>
 #include <vector>
+#include <search.h>
 using namespace std;
 
 class imdb {

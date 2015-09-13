@@ -4,7 +4,20 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 using namespace std;
+
+/* Struct actor - Not using yet
+ */
+struct actor {
+
+    const char * name;
+    void * base;
+    //short nmovs;
+};
+
 
 /**
  * Convenience struct: film
@@ -43,7 +56,7 @@ struct film {
   
   bool operator<(const film& rhs) const { 
     return this->title < rhs.title || 
-           this->title == rhs.title && this->year < rhs.year; 
+           (this->title == rhs.title && this->year < rhs.year); 
   }
 };
 
@@ -61,11 +74,11 @@ inline const char *determinePathToData(const char *userSelectedPath = NULL)
 {
   if (userSelectedPath != NULL) return userSelectedPath;
   
-  const char *ostype = getenv("OSTYPE");
-  if (strcasecmp(ostype, "linux") == 0)
-    return "/usr/class/cs107/assignments/assn-2-six-degrees-data/little-endian/";
-  if (strcasecmp(ostype, "solaris") == 0)
-    return "/usr/class/cs107/assignments/assn-2-six-degrees-data/big-endian/";
+//  const char *ostype = getenv("OSTYPE");
+//  cout << endl << *ostype << endl;
+//  if (strcasecmp(ostype, "linux") == 0)
+ // return "data/little-endian/";
+  return "/home/jamie/Programming/Udemy/CS107_assignments/Stanford-CS107/assn-2-six-degrees/data/little-endian/";
   
   cerr << "Unsupported OS... bailing" << endl;
   exit(1);

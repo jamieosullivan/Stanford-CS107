@@ -29,14 +29,8 @@ bool imdb::good() const
 // cmp1 is the address of the input actor string, while cmp2 is the pointer
 // to the next integer offset of an actor in the actorFile
 int myStrCmp(const void *cmp1, const void *cmp2){
-    /*
-    char * str1 = *(char **)cmp1;
-    char * str2 = *(char **)cmp2;
-    */
-//    printf("cmp1 base: %lx\n", cmp1);
+
     char * str1 = * (char **) cmp1;
-//    printf("input name: %s\n", str1);
-   // unsigned long int xx = *(char **)((char *)cmp1 + sizeof(char *)) + *(int *)cmp2;
     char * str2 = (char *)(*(char **)((char *)cmp1 + sizeof(char *)) + *(int *)cmp2);
 //				      ^__________^
 //				       &actor
@@ -49,12 +43,7 @@ int myStrCmp(const void *cmp1, const void *cmp2){
 //		  ^_______________________________________________________________^
 //			    cast that address to be (char *)
 //				            
-   // printf("homing in on base: %lx\n",xx);
-   // printf("test string: %s\n",(char *)xx);
     printf("test string: %s\n",str2);
-	   // + sizeof(char *)
-//    char * str2 = ((char *)cmp1+sizeof(char *)) + *(int *)cmp2 ;
- //   printf("test name: %s\n", str2);
 
     return strcmp(str1, str2);	
     return 0;	
@@ -68,19 +57,22 @@ bool imdb::getCredits(const string& player, vector<film>& films) const {
     int *offarray = (int *)(actorFile);
 
     struct actor key = { player.c_str(), (void *)actorFile };
-    printf("address of key: %lx\n", &key);
-    printf("key name: %s\n", key.name);
-    printf("name address: %lx\n", &key.name);
-    printf("key base: %lx\n", key.base);
-    printf("base address: %lx\n", &key.base);
     int *res;
 
-    res = bsearch((void **)&key, &offarray[1], nActors, sizeof(int), myStrCmp);
+    // Cast (int *) just to avoid warning
+    res = (int *)bsearch((void **)&key, &offarray[1], nActors, sizeof(int), myStrCmp);
     if (res == NULL) {
 	printf("Not found\n");
     } else {
 	printf("found %d at offset\n", *res);
     }
+
+    // Update our actor struct with address of actor record
+    key.base = (char *)actorFile + *res;
+
+//    printf("base: %lx\tname: %s\n", key.base, (char *)key.base);
+
+    short actorCredits = *(short *)(key.base + strlen(key.name) + strlen(key.name + 1)%2)
         
     return false; 
 }

@@ -3,7 +3,7 @@
 ##
 
 #CPPFLAGS = -g -Wall
-CPPFLAGS = -ggdb -Wall -fpermissive
+CPPFLAGS = -ggdb -Wall 
 CXX = g++
 LDFLAGS =
 

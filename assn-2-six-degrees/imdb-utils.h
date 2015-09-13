@@ -10,7 +10,9 @@
 using namespace std;
 
 /* Struct actor - Not using yet
+ * (Note - change the type of base to reduce need for casting later??)
  */
+
 struct actor {
 
     const char * name;
@@ -60,6 +62,12 @@ struct film {
   }
 };
 
+/* Making a wrapper struct to hold base address of movieFile 
+ */
+struct filmwrap {
+    struct film wfilm;
+    int * base;
+};
 /**
  * Quick, UNIX-dependent function to determine whether or not the
  * the resident OS is Linux or Solaris.  For our purposes, this

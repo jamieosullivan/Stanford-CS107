@@ -37,6 +37,28 @@ static string promptForActor(const string& prompt, const imdb& db)
   }
 }
 
+
+/**
+ * Implementation of generateShortestPath
+ */
+path & generateShortestPath(const string &source, const string &target) {
+
+    list<path> partialPaths;
+    set<string> previouslySeenActors;
+    set<string> previouslySeenMovies;
+
+    path sourcePath(source);
+    partialPaths.push_back(sourcePath);
+    while ((!partialPaths.empty()) && (partialPaths.front().getLength() < 5)){
+	path frontpath = partialPaths.front();
+	partialPaths.pop_front();
+	frontpath.getLastPlayer().getCredits();
+    }
+}
+	
+
+
+
 /**
  * Serves as the main entry point for the six-degrees executable.
  * There are no parameters to speak of.
@@ -70,7 +92,10 @@ int main(int argc, const char *argv[])
       cout << "Good one.  This is only interesting if you specify two different people." << endl;
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
-      cout << endl << "No path between those two people could be found." << endl << endl;
+      //
+      
+
+//      cout << endl << "No path between those two people could be found." << endl << endl;
     }
   }
   

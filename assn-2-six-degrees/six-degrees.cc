@@ -41,22 +41,51 @@ static string promptForActor(const string& prompt, const imdb& db)
 /**
  * Implementation of generateShortestPath
  */
-path & generateShortestPath(const string &source, const string &target) {
+//path & generateShortestPath(const imdb & db, const string &source, const string &target) {
+void generateShortestPath(const imdb & db, const string &source, const string &target) {
 
     list<path> partialPaths;
     set<string> previouslySeenActors;
     set<string> previouslySeenMovies;
 
+    previouslySeenActors.insert(source);    // Exclude our source actor
     path sourcePath(source);
-    partialPaths.push_back(sourcePath);
+    partialPaths.push_front(sourcePath);
     while ((!partialPaths.empty()) && (partialPaths.front().getLength() < 5)){
 	path frontpath = partialPaths.front();
 	partialPaths.pop_front();
-	frontpath.getLastPlayer().getCredits();
+	vector<film> films;
+	string cplayer = frontpath.getLastPlayer();
+	db.getCredits(cplayer, films);
+	for(vector<film>::iterator it=films.begin(); it != films.end(); ++it){
+	    // Might need extra logic to check movie years match..
+	    if(previouslySeenMovies.find(it->title) != previouslySeenMovies.end()){
+		continue;	    // Skip ahead if we've done this movie
+	    } else {		    // otherwise add it to the set
+		previouslySeenMovies.insert(it->title);
+	    }
+	    vector<string> players;
+	    db.getCast(*it, players);
+	    for(vector<string>::iterator itp=players.begin(); itp != players.end(); ++itp){
+		if(previouslySeenActors.find(*itp) != previouslySeenActors.end()){
+		   continue;
+		} else {
+		   previouslySeenActors.insert(*itp);
+		} 
+		path clone = frontpath;
+		clone.addConnection(*it, *itp);
+		if(*itp == target){
+		    cout << clone << endl;
+		    return;
+		} else { 
+		    partialPaths.push_back(clone);
+		}  
+	    }
+	}
     }
-}
-	
+    cout << "Didn't find a path" << endl;
 
+}
 
 
 /**
@@ -76,6 +105,7 @@ path & generateShortestPath(const string &source, const string &target) {
 
 int main(int argc, const char *argv[])
 {
+ // imdb db(determinePathToData(argv[1])); // inlined in imdb-utils.h
   imdb db(determinePathToData(argv[1])); // inlined in imdb-utils.h
   if (!db.good()) {
     cout << "Failed to properly initialize the imdb database." << endl;
@@ -93,12 +123,11 @@ int main(int argc, const char *argv[])
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
       //
-      
-
-//      cout << endl << "No path between those two people could be found." << endl << endl;
+	generateShortestPath(db, source, target);     
     }
   }
   
+  cout << endl << "No path between those two people could be found." << endl << endl;
   cout << "Thanks for playing!" << endl;
   return 0;
 }

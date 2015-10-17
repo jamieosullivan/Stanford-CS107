@@ -63,7 +63,7 @@ bool imdb::getCredits(const string& player, vector<film>& films) const {
 	printf("Not found\n");
 	return false; 
     } else {
-	printf("found %d at offset\n", *res);
+//	printf("found %d at offset\n", *res);
     }
 
     // Update our actor struct with address of actor record
@@ -137,7 +137,7 @@ bool imdb::getCast(const film& movie, vector<string>& players) const {
 	printf("Not found\n");
 	return false; 
     } else {
-	printf("found %d at offset\n", *res);
+//	printf("found %d at offset\n", *res);
     }
     wkey.base = (int *)((char *)movieFile + *res);
 //    printf("Found Movie %s\n",(char *)wkey.base);    
@@ -152,7 +152,7 @@ bool imdb::getCast(const film& movie, vector<string>& players) const {
     char *actorStr;
     string actor;
 
-    printf("Found Movie %s, %d actors\n",(char *)wkey.base, nActors);    
+//    printf("Found Movie %s, %d actors\n",(char *)wkey.base, nActors);    
     for (int i = 0; i < nActors; i++) {
 	actorStr = (char *)((char *)actorFile + *(actorOffsets + i));
 //	printf("Actor: %s\n", actorStr);

@@ -1,6 +1,7 @@
 #include "vector.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <search.h>
 #include <string.h>
 #include <assert.h>
 
@@ -69,6 +70,7 @@ void VectorSort(vector *v, VectorCompareFunction compare)
     // Use qsort
     // void qsort(void *base, size_t nmemb, size_t size,
     //                   int (*compar)(const void *, const void *));
+    qsort(v->elems, v->loglen, v->elemsize, compare);
 
 }
 
@@ -85,4 +87,37 @@ void VectorMap(vector *v, VectorMapFunction mapFn, void *auxData)
 
 static const int kNotFound = -1;
 int VectorSearch(const vector *v, const void *key, VectorCompareFunction searchFn, int startIndex, bool isSorted)
-{ return -1; } 
+{ 
+    void *res;
+    int foundIndex;
+    assert((startIndex >= 0) && (startIndex <= v->loglen));
+    assert((key != NULL) && (searchFn != NULL));
+
+    // Check value of isSorted to decide whether to use bisection or linear search
+    if (isSorted) {
+	// Use binary search
+//	res = (int *)bsearch(key, v->elems, v->loglen, v->elemsize, searchFn);
+	res = bsearch(key, v->elems, v->loglen, v->elemsize, searchFn);
+	if (res == NULL) {
+//	    printf("Not found\n");
+	    return -1;
+	} else {
+	    foundIndex = ((char *)res - (char *)v->elems) / v->elemsize;
+//	    printf("Found %c at index %d\n", *(char *)res, foundIndex);
+	    return foundIndex;
+	}
+    } else {
+	// Use linear search
+	res = lfind(key, v->elems, (size_t *)&v->loglen, v->elemsize, searchFn);
+	if (res == NULL) {
+//	    printf("Not found\n");
+	    return -1;
+	} else {
+	    foundIndex = ((char *)res - (char *)v->elems) / v->elemsize;
+//	    printf("Found %c at index %d\n", *(char *)res, foundIndex);
+	    return foundIndex;
+	}
+    }
+
+    return -1; 
+} 

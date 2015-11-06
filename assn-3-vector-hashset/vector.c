@@ -34,16 +34,45 @@ void VectorDispose(vector *v)
 }
 
 int VectorLength(const vector *v)
-{ return 0; }
+{ 
+    return v->loglen; 
+}
 
 void *VectorNth(const vector *v, int position)
-{ return NULL; }
+{ 
+    void *ret;
+    assert((position >= 0) && (position < (v->loglen-1)));
+    ret = (char *)v->elems + v->loglen * v->elemsize;
+    return ret; 
+}
 
 void VectorReplace(vector *v, const void *elemAddr, int position)
-{}
+{
+    assert((position >= 0) && (position < (v->loglen-1)));
+    void *pos = (char *)v->elems + position * v->elemsize;
+    if (v->freefn == NULL) {
+
+    } else {
+	v->freefn(pos);
+    }
+    memcpy(pos, elemAddr, v->elemsize);
+
+}
 
 void VectorInsert(vector *v, const void *elemAddr, int position)
-{}
+{
+    assert((position >= 0) && (position < (v->loglen)));
+    void *pos = (char *)v->elems + position * v->elemsize;
+    void *dst = (char *)pos + v->elemsize;
+    int len = (v->loglen - position) * v->elemsize; // loglen - 1 ??
+    if (v->loglen == v->alloclen) {
+	v->elems = realloc(v->elems, v->alloclen + v->allocinc * v->elemsize);
+	v->alloclen += v->allocinc;
+    } 
+    memmove(dst, pos, len);
+    memcpy(pos, elemAddr, v->elemsize);
+    v->loglen += 1;
+}
 
 void VectorAppend(vector *v, const void *elemAddr)
 {
@@ -55,7 +84,7 @@ void VectorAppend(vector *v, const void *elemAddr)
 	void *dst = (char *)v->elems + v->loglen * v->elemsize;
 	memcpy(dst, elemAddr, v->elemsize);
 	v->loglen += 1;
-    } else {
+    } else {	// could remove this duplication
 	void *dst = (char *)v->elems + v->loglen * v->elemsize;
 	memcpy(dst, elemAddr, v->elemsize); 
 	v->loglen += 1;

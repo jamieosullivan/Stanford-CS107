@@ -70,9 +70,9 @@ typedef void (*VectorFreeFunction)(void *elemAddr);
 typedef struct {
     void * elems;
     int elemsize;
-    int alloclen;
-    int allocinc;
-    int loglen;
+    long int alloclen;
+    long int allocinc;
+    long int loglen;
     VectorFreeFunction freefn;
   //  free function
 } vector;

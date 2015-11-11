@@ -21,16 +21,18 @@ void VectorNew(vector *v, int elemSize, VectorFreeFunction freeFn, int initialAl
 void VectorDispose(vector *v)
 {
     if (v->freefn == NULL) { // simple free
-	free(v);
+	free(v->elems);
     } else {		    // need to invoke the free function for each element
 	void *elemptr = (void *)v->elems;
 	int index = 0;
 	while (index < v->loglen) {
-	    elemptr = (char *)elemptr + index * v->elemsize;
+	    //elemptr = (char *)elemptr + index * v->elemsize;
 	    v->freefn(elemptr);
+	    elemptr = (char *)elemptr + v->elemsize;
 	    index++;
 	}
     }
+    // Re-initialize loglen etc.?
 }
 
 int VectorLength(const vector *v)
@@ -41,14 +43,14 @@ int VectorLength(const vector *v)
 void *VectorNth(const vector *v, int position)
 { 
     void *ret;
-    assert((position >= 0) && (position < (v->loglen-1)));
-    ret = (char *)v->elems + v->loglen * v->elemsize;
+    assert((position >= 0) && (position <= (v->loglen-1)));
+    ret = (char *)v->elems + position * v->elemsize;
     return ret; 
 }
 
 void VectorReplace(vector *v, const void *elemAddr, int position)
 {
-    assert((position >= 0) && (position < (v->loglen-1)));
+    assert((position >= 0) && (position <= (v->loglen-1)));
     void *pos = (char *)v->elems + position * v->elemsize;
     if (v->freefn == NULL) {
 
@@ -61,7 +63,7 @@ void VectorReplace(vector *v, const void *elemAddr, int position)
 
 void VectorInsert(vector *v, const void *elemAddr, int position)
 {
-    assert((position >= 0) && (position < (v->loglen)));
+    assert((position >= 0) && (position <= (v->loglen)));
     void *pos = (char *)v->elems + position * v->elemsize;
     void *dst = (char *)pos + v->elemsize;
     int len = (v->loglen - position) * v->elemsize; // loglen - 1 ??
@@ -79,7 +81,8 @@ void VectorAppend(vector *v, const void *elemAddr)
     if (v->loglen == v->alloclen) {
 	// Add more elements
 	// TODO initialise the new part of the vector
-	v->elems = realloc(v->elems, v->alloclen + v->allocinc * v->elemsize);
+	//v->elems = realloc(v->elems, v->alloclen + v->allocinc * v->elemsize);
+	v->elems = realloc(v->elems, (v->alloclen + v->allocinc) * v->elemsize);
 	v->alloclen += v->allocinc;
 	void *dst = (char *)v->elems + v->loglen * v->elemsize;
 	memcpy(dst, elemAddr, v->elemsize);
@@ -92,7 +95,18 @@ void VectorAppend(vector *v, const void *elemAddr)
 }
 
 void VectorDelete(vector *v, int position)
-{}
+{
+    assert((position >= 0) && (position <= (v->loglen-1)));
+    void *pos = (char *)v->elems + position * v->elemsize;
+    void *src = (char *)pos + v->elemsize;
+    int len = (v->loglen - position - 1) * v->elemsize;
+    if (v->freefn == NULL) {
+    } else {
+	v->freefn(pos);
+    }
+    memmove(pos, src, len);
+    v->loglen--;
+}
 
 void VectorSort(vector *v, VectorCompareFunction compare)
 {
